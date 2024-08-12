@@ -3,7 +3,8 @@ import pandas as pd
 
 import tensorflow as tf
 from tensorflow import keras
-from keras import layers
+from tensorflow.keras import layers
+from tensorflow.keras.callbacks import EarlyStopping
 
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -15,7 +16,7 @@ from glob import glob
 from sklearn.model_selection import train_test_split
 
 # Hyperparameters
-IMG_SIZE = 256
+IMG_SIZE = 128
 SPLIT = 0.2
 EPOCHS = 10
 BATCH_SIZE = 64
@@ -56,8 +57,20 @@ def loadData():
 
 def buildModel():
     model = keras.Sequential()
+    model.layers.add(layers.Conv2D(filters=16, kernel_size=(5, 5), activation='sigmoid', input_shape=(IMG_SIZE, IMG_SIZE, 3)))
+    model.layers.add(layers.MaxPooling2D(pool_size=(2, 2)))
+    model.layers.add(layers.Conv2D(filters=32, kernel_size=(5, 5), activation='sigmoid'))
+    model.layers.add(layers.MaxPooling2D(pool_size=(2, 2)))
+    model.layers.add(layers.Flatten())
+    model.layers.add(layers.Dense(256, activation='sigmoid'))
+    model.layers.add(layers.BatchNormalization)
+    model.layers.add(layers.Dropout(0.5))
+    model.layers.add(layers.Dense(64, activation='sigmoid'))
+    model.layers.add(layers.BatchNormalization)
+    model.layers.add(layers.Dropout(0.5))
+    model.layers.add(layers.Dense(3, activation='softmax'))
 
-    
+    return model
 
 def main():
     # Load the data
@@ -65,3 +78,9 @@ def main():
 
     # Split the data into training and testing sets
     x_train, x_test, y_train, y_test = train_test_split(images, labels, test_size=SPLIT)
+
+    # Build the model
+    model = buildModel()
+
+    # Compile the model
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
