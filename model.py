@@ -3,8 +3,8 @@ import pandas as pd
 
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras.callbacks import EarlyStopping
+from keras import layers
+from keras.callbacks import EarlyStopping
 
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -56,21 +56,35 @@ def loadData():
     return numpyImages, oneHotLabels
 
 def buildModel():
-    model = keras.Sequential()
-    model.layers.add(layers.Conv2D(filters=16, kernel_size=(5, 5), activation='sigmoid', input_shape=(IMG_SIZE, IMG_SIZE, 3)))
-    model.layers.add(layers.MaxPooling2D(pool_size=(2, 2)))
-    model.layers.add(layers.Conv2D(filters=32, kernel_size=(5, 5), activation='sigmoid'))
-    model.layers.add(layers.MaxPooling2D(pool_size=(2, 2)))
-    model.layers.add(layers.Flatten())
-    model.layers.add(layers.Dense(256, activation='sigmoid'))
-    model.layers.add(layers.BatchNormalization)
-    model.layers.add(layers.Dropout(0.5))
-    model.layers.add(layers.Dense(64, activation='sigmoid'))
-    model.layers.add(layers.BatchNormalization)
-    model.layers.add(layers.Dropout(0.5))
-    model.layers.add(layers.Dense(3, activation='softmax'))
+    model = keras.models.Sequential([
+        layers.Conv2D(filters=16, kernel_size=(5, 5), activation='sigmoid', input_shape=(IMG_SIZE, IMG_SIZE, 3)),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(filters=32, kernel_size=(5, 5), activation='sigmoid'),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+
+        layers.Flatten(),
+
+        layers.Dense(256, activation='sigmoid'),
+        layers.BatchNormalization(),
+        layers.Dropout(0.5),
+        layers.Dense(64, activation='sigmoid'),
+        layers.BatchNormalization(),
+        layers.Dropout(0.5),
+
+        layers.Dense(3, activation='softmax')
+    ])
 
     return model
+
+class callBack(tf.keras.callbacks.Callback):
+    def on_epoch_end(self, epoch, logs={}):
+        # Save the model
+        name = 'model' + str(epoch) + '.h5'
+        self.model.save(name)
+
+        if logs.get('accuracy') > 0.99:
+            print("\nReached 99% accuracy so cancelling training!")
+            self.model.stop_training = True
 
 def main():
     # Load the data
@@ -84,3 +98,16 @@ def main():
 
     # Compile the model
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+
+    earlyStop = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+
+    training = model.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=[earlyStop, callBack()])
+
+    trainingData = pd.DataFrame(training.history)
+    trainingData.loc[:, ['loss', 'val_loss']].plot()
+    trainingData.loc[:, ['accuracy', 'val_accuracy']].plot()
+    plt.show()
+
+if __name__ == '__main__':
+    main()
+    
