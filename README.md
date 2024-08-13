@@ -26,40 +26,27 @@ The model currently achieves an 88.97% correct classification rate, with the fol
 - The model itself uses an ADAM optimizer with a lr of 0.005, categorical cross entropy for its loss function, and accuracy as its metric.
 
 Below is a summary of the model:
-Model: "sequential"
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
-┃ Layer (type)                         ┃ Output Shape                ┃         Param # ┃
-┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━┩
-│ conv2d (Conv2D)                      │ (None, 124, 124, 16)        │           1,216 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ max_pooling2d (MaxPooling2D)         │ (None, 62, 62, 16)          │               0 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ conv2d_1 (Conv2D)                    │ (None, 60, 60, 64)          │           9,280 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ max_pooling2d_1 (MaxPooling2D)       │ (None, 30, 30, 64)          │               0 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ flatten (Flatten)                    │ (None, 57600)               │               0 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ dense (Dense)                        │ (None, 128)                 │       7,372,928 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ batch_normalization                  │ (None, 128)                 │             512 │
-│ (BatchNormalization)                 │                             │                 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ dropout (Dropout)                    │ (None, 128)                 │               0 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ dense_1 (Dense)                      │ (None, 32)                  │           4,128 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ batch_normalization_1                │ (None, 32)                  │             128 │
-│ (BatchNormalization)                 │                             │                 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ dropout_1 (Dropout)                  │ (None, 32)                  │               0 │
-├──────────────────────────────────────┼─────────────────────────────┼─────────────────┤
-│ dense_2 (Dense)                      │ (None, 3)                   │              99 │
-└──────────────────────────────────────┴─────────────────────────────┴─────────────────┘
- Total params: 7,388,291 (28.18 MB)
- Trainable params: 7,387,971 (28.18 MB)
- Non-trainable params: 320 (1.25 KB)
- 
+Below is a summary of the neural network model:
+
+| Layer (type)            | Output Shape        | Param #    |
+|-------------------------|---------------------|------------|
+| **conv2d (Conv2D)**          | (None, 124, 124, 16) | 1,216      |
+| **max_pooling2d (MaxPooling2D)** | (None, 62, 62, 16)  | 0          |
+| **conv2d_1 (Conv2D)**        | (None, 60, 60, 64)   | 9,280      |
+| **max_pooling2d_1 (MaxPooling2D)** | (None, 30, 30, 64)  | 0          |
+| **flatten (Flatten)**       | (None, 57600)      | 0          |
+| **dense (Dense)**           | (None, 128)        | 7,372,928  |
+| **batch_normalization (BatchNormalization)** | (None, 128)        | 512        |
+| **dropout (Dropout)**       | (None, 128)        | 0          |
+| **dense_1 (Dense)**         | (None, 32)         | 4,128      |
+| **batch_normalization_1 (BatchNormalization)** | (None, 32)         | 128        |
+| **dropout_1 (Dropout)**     | (None, 32)         | 0          |
+| **dense_2 (Dense)**         | (None, 3)          | 99         |
+
+**Total params:** 7,388,291 (28.18 MB)  
+**Trainable params:** 7,387,971 (28.18 MB)  
+**Non-trainable params:** 320 (1.25 KB)
+
 ## Data Processing
 - The data is condensed using openCV's resize feature and then all pixels are normalized.
 - The images are stored alongside a one-hot label that identifies each image's class.
