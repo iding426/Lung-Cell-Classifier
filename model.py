@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import pickle
 
 import tensorflow as tf
 from tensorflow import keras
@@ -20,6 +21,15 @@ IMG_SIZE = 128
 SPLIT = 0.2
 EPOCHS = 10
 BATCH_SIZE = 64
+
+# Use pickle to save data to a file, so it does not have to be loaded every time
+def saveData(data, filename):
+    with open(filename, 'wb') as f:
+        pickle.dump(data, f)
+
+def openData(filename):
+    with open(filename, 'rb') as f:
+        return pickle.load(f)
 
 def loadData():
     lungImagePath = 'lung_image_sets'
@@ -59,17 +69,19 @@ def buildModel():
     model = keras.models.Sequential([
         layers.Conv2D(filters=16, kernel_size=(5, 5), activation='sigmoid', input_shape=(IMG_SIZE, IMG_SIZE, 3)),
         layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(filters=32, kernel_size=(5, 5), activation='sigmoid'),
+        layers.Conv2D(filters=64, kernel_size=(4, 4), activation='sigmoid'),
+        layers.MaxPooling2D(pool_size=(2, 2)),
+        layers.Conv2D(filters=128, kernel_size=(3, 3), activation='sigmoid'),
         layers.MaxPooling2D(pool_size=(2, 2)),
 
         layers.Flatten(),
 
         layers.Dense(256, activation='sigmoid'),
         layers.BatchNormalization(),
-        layers.Dropout(0.5),
+        layers.Dropout(0.25),
         layers.Dense(64, activation='sigmoid'),
         layers.BatchNormalization(),
-        layers.Dropout(0.5),
+        layers.Dropout(0.25),
 
         layers.Dense(3, activation='softmax')
     ])
@@ -79,17 +91,25 @@ def buildModel():
 class callBack(tf.keras.callbacks.Callback):
     def on_epoch_end(self, epoch, logs={}):
         # Save the model
-        name = 'model' + str(epoch) + '.h5'
-        self.model.save(name)
+        # name = 'model' + str(epoch) + '.keras'
+        # self.model.save(name)
 
         if logs.get('accuracy') > 0.99:
             print("\nReached 99% accuracy so cancelling training!")
             self.model.stop_training = True
 
 def main():
-    # Load the data
-    images, labels = loadData()
-
+    data_file = 'data.pkl'
+    
+    if os.path.exists(data_file):
+        # Load data from file
+        images, labels = openData(data_file)
+    else:
+        # Load and process data
+        images, labels = loadData()
+        # Save data to file
+        saveData((images, labels), data_file)
+    
     # Split the data into training and testing sets
     x_train, x_test, y_train, y_test = train_test_split(images, labels, test_size=SPLIT)
 
@@ -99,7 +119,7 @@ def main():
     # Compile the model
     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
 
-    earlyStop = EarlyStopping(monitor='val_loss', patience=3, restore_best_weights=True)
+    earlyStop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
 
     training = model.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=[earlyStop, callBack()])
 
