@@ -26,7 +26,6 @@ The model currently achieves an 88.97% correct classification rate, with the fol
 - The model itself uses an ADAM optimizer with a lr of 0.005, categorical cross entropy for its loss function, and accuracy as its metric.
 
 Below is a summary of the model:
-Below is a summary of the neural network model:
 
 | Layer (type)            | Output Shape        | Param #    |
 |-------------------------|---------------------|------------|
