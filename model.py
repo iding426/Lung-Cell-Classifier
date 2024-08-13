@@ -6,6 +6,7 @@ import tensorflow as tf
 from tensorflow import keras
 from keras import layers
 from keras.callbacks import EarlyStopping
+from keras.optimizers import Adam
 
 import cv2 as cv
 import matplotlib.pyplot as plt
@@ -19,8 +20,9 @@ from sklearn.model_selection import train_test_split
 # Hyperparameters
 IMG_SIZE = 128
 SPLIT = 0.2
-EPOCHS = 10
+EPOCHS = 20
 BATCH_SIZE = 64
+LEARNING_RATE = 0.0005
 
 # Use pickle to save data to a file, so it does not have to be loaded every time
 def saveData(data, filename):
@@ -67,19 +69,17 @@ def loadData():
 
 def buildModel():
     model = keras.models.Sequential([
-        layers.Conv2D(filters=16, kernel_size=(5, 5), activation='sigmoid', input_shape=(IMG_SIZE, IMG_SIZE, 3)),
+        layers.Conv2D(filters=16, kernel_size=(5, 5), activation='relu', input_shape=(IMG_SIZE, IMG_SIZE, 3)),
         layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(filters=64, kernel_size=(4, 4), activation='sigmoid'),
-        layers.MaxPooling2D(pool_size=(2, 2)),
-        layers.Conv2D(filters=128, kernel_size=(3, 3), activation='sigmoid'),
+        layers.Conv2D(filters=64, kernel_size=(3, 3), activation='relu'),
         layers.MaxPooling2D(pool_size=(2, 2)),
 
         layers.Flatten(),
 
-        layers.Dense(256, activation='sigmoid'),
+        layers.Dense(128, activation='relu'),
         layers.BatchNormalization(),
         layers.Dropout(0.25),
-        layers.Dense(64, activation='sigmoid'),
+        layers.Dense(32, activation='relu'),
         layers.BatchNormalization(),
         layers.Dropout(0.25),
 
@@ -97,6 +97,9 @@ class callBack(tf.keras.callbacks.Callback):
         if logs.get('accuracy') > 0.99:
             print("\nReached 99% accuracy so cancelling training!")
             self.model.stop_training = True
+
+            # Save the model
+            self.model.save('model.keras')
 
 def main():
     data_file = 'data.pkl'
@@ -117,9 +120,10 @@ def main():
     model = buildModel()
 
     # Compile the model
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+    optimize = Adam(learning_rate=LEARNING_RATE)
+    model.compile(optimizer=optimize, loss='categorical_crossentropy', metrics=['accuracy'])
 
-    earlyStop = EarlyStopping(monitor='val_loss', patience=5, restore_best_weights=True)
+    earlyStop = EarlyStopping(monitor='val_loss', patience=8, restore_best_weights=True)
 
     training = model.fit(x_train, y_train, epochs=EPOCHS, batch_size=BATCH_SIZE, validation_data=(x_test, y_test), callbacks=[earlyStop, callBack()])
 
