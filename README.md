@@ -8,10 +8,10 @@ The data set includes 3 class of tissue with 5000 images for each class.
  - Adenocarcinoma Lung Tissue
  - Squamous Cell Carcinoma Lung Tissue
 
-The model currently achieves an 88.97% correct classification rate, with the following learning curves showing training verses validation loss and accuracy. 
+The model currently achieves a 92.57% correct classification rate, with the following learning curves showing training verses validation loss and accuracy. 
 
-![Figure_1](https://github.com/user-attachments/assets/a8689706-c826-414c-8888-cd004c88839c)
-![Figure_2](https://github.com/user-attachments/assets/cd4d0e0d-d760-4908-8560-9a3ca768a00a)
+![Figure_1](https://github.com/user-attachments/assets/f7ce5023-889a-425e-8cc5-c83e4d47c6b0)
+![Figure_2](https://github.com/user-attachments/assets/36f554aa-5cb4-4e70-b64f-1273f3ec576f)
 
 ## Table of Contents 
 - [Model Design](#model-design)
@@ -23,7 +23,7 @@ The model currently achieves an 88.97% correct classification rate, with the fol
   -   2 Dense layers with BatchNormalization and Dropout of 0.25
   -   An output layer with 3 nodes that uses softmax to weigh probabilities.
 - All layers besides the output use a 'relu' activation function.
-- The model itself uses an ADAM optimizer with a lr of 0.005, categorical cross entropy for its loss function, and accuracy as its metric.
+- The model itself uses an ADAM optimizer with a lr of 0.0001, categorical cross entropy for its loss function, and accuracy as its metric.
 
 Below is a summary of the model:
 
