@@ -2,7 +2,7 @@
 
 ** Dataset from [Kaggle](https://www.kaggle.com/datasets/andrewmvd/lung-and-colon-cancer-histopathological-images/data) ** 
 
-Implements a deep learning model that uses a Convolutional Neural Network to identify and classify lung tissue from histopathical images.
+Implements a deep learning model that uses a Convolutional Neural Network to identify and classify lung tissue from histopathological images.
 The data set includes 3 class of tissue with 5000 images for each class.
  - Benign Lung Tissue
  - Adenocarcinoma Lung Tissue
