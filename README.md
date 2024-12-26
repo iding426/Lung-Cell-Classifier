@@ -11,7 +11,6 @@ The data set includes 3 class of tissue with 5000 images for each class.
 The model currently achieves a 92.57% correct classification rate, with the following learning curves showing training verses validation loss and accuracy. 
 
 ![Figure_1](https://github.com/user-attachments/assets/f7ce5023-889a-425e-8cc5-c83e4d47c6b0)
-![Figure_2](https://github.com/user-attachments/assets/36f554aa-5cb4-4e70-b64f-1273f3ec576f)
 
 ## Table of Contents 
 - [Model Design](#model-design)
